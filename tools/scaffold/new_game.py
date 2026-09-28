@@ -33,7 +33,7 @@ def build_context(args) -> dict:
         "title": args.title or args.name,
         "platform": args.platform,
         "engine": args.engine,
-        "pipeline_root": str(Path(args.pipeline_root).resolve()),
+        "pipeline_root": Path(args.pipeline_root).resolve().as_posix(),
         "creator_path": creator_path.replace("\\", "/") if creator_path else "",
         "date": datetime.date.today().isoformat(),
     }

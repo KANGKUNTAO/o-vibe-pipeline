@@ -97,6 +97,11 @@ def main(argv=None) -> int:
         status = entry.get("状态", "")
         row: dict = {"id": asset_id, "status": status, "category": entry.get("类别", ""),
                      "checks": [], "level": "skip"}
+        if not asset_id:
+            row["level"], row["message"] = "warn", "清单行缺 ID(资产 ID 是硬性规范),请补全"
+            summary["warn"] += 1
+            report_entries.append(row)
+            continue
         if entry.get("类别") not in manifest.IMAGE_CATEGORIES:
             row["message"] = "非图片类资产,跳过(音频/字体检查器待建)"
             summary["skip"] += 1

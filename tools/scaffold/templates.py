@@ -5,10 +5,10 @@ AGENTS_MD = """# AGENTS.md — {title}({name})
 
 接到任何与本工程相关的任务,按以下顺序执行:
 
-1. **先读管线总入口**:`{pipeline_root}\\manuals\\总入口.md`,按五步工作流(需求 → 规划 → 白盒 → 资产精修 → 实机验收)干活,不过关不进下一步。
-2. **成品标准**:`{pipeline_root}\\manuals\\验收清单.md` 通用 8 条 + `adapters/platform/{platform}/验收附录.md` 全部打勾才算成品;验收证据存本工程 `evidence/`。
-3. **写代码前**:`{pipeline_root}\\manuals\\代码生成.md`(分层契约)+ `{pipeline_root}\\adapters\\cocos\\引擎上下文.md`(API 纪律);机制契约在 `docs/机制契约.md`。
-4. **操作 Cocos 编辑器**:用 MCP 工具 `cocos_creator_local`(已在本工程 `.zcode/config.json` 配好),用法见 `{pipeline_root}\\adapters\\cocos\\引擎操作.md`。
+1. **先读管线总入口**:`{pipeline_root}/manuals/总入口.md`,按五步工作流(需求 → 规划 → 白盒 → 资产精修 → 实机验收)干活,不过关不进下一步。
+2. **成品标准**:`{pipeline_root}/manuals/验收清单.md` 通用 8 条 + `adapters/platform/{platform}/验收附录.md` 全部打勾才算成品;验收证据存本工程 `evidence/`。
+3. **写代码前**:`{pipeline_root}/manuals/代码生成.md`(分层契约)+ `{pipeline_root}/adapters/cocos/引擎上下文.md`(API 纪律);机制契约在 `docs/机制契约.md`。
+4. **操作 Cocos 编辑器**:用 MCP 工具 `cocos_creator_local`(已在本工程 `.zcode/config.json` 配好),用法见 `{pipeline_root}/adapters/cocos/引擎操作.md`。
 5. **两仓分离**:本工程只放本游戏自己的东西;手册/工具/组件库的正本在 vibe-pipeline 仓库,组件库只从 `adapters/cocos/组件库/` 拷**副本**进 `assets/components/`。
 6. 资产 ID 前缀 `{name}`,在 `docs/资产清单.md` 冻结;占位文件可用 `tools/placeholder/gen.py` 生成;每件成品资产记录出处与许可证。
 """
