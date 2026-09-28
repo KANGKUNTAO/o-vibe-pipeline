@@ -1,7 +1,7 @@
 # 商业化组件库(M4)— 休闲游戏「标配八件套」
 
 > 休闲小游戏的系统层高度同质:签到、商店、分享、排行榜、红点、广告位、设置、成就/任务。把它们做成可复用 Cocos 组件,新游戏拷副本、填配置、接回调即可上线系统层。  
-> 状态:settings/reddot/signin/adslot/shop/achievement/share 已实现(logic 核 66 测试全绿);其余为接口约定,随 001 的 M4 阶段落地。
+> 状态:**八件套全部实现**(logic 核 73 测试全绿);接入 001 的 M4 阶段时逐组件在实机验证。
 
 ## 架构分层(2026-09-29 定稿,遵守 manuals/代码生成.md)
 
@@ -65,7 +65,7 @@ tests/                逻辑核测试:cd 本目录 && npm test(node --test,零 n
 | `shop` | ✅ logic+ui,10 测试(商品表/每日+终身限购/钱包扣款/发放指令不入包/损坏档兜底) |
 | `achievement` | ✅ logic+ui,11 测试(sum/max 双模式计数器/done 恰好一次/领奖发放指令/同计数器歧义校验) |
 | `share` | ✅ logic+ui,11 测试(场景卡片/每日限次+冷却防刷/防连点/适配层异常降级) |
-| `leaderboard` | ⬜ 接口已约定,随 001 M4 落地 |
+| `leaderboard` | ✅ logic,7 测试(best/last 上报治理/纪录留档);展示侧走开放数据域,见 wechat-adapter/开放数据域.md |
 
 ## 实现纪律
 
@@ -79,3 +79,4 @@ tests/                逻辑核测试:cd 本目录 && npm test(node --test,零 n
 | -- | ---- | --- |
 | 2026-09-29 | signin 组件落地(logic+ui+13 测试;周期按自然日网格对齐,补签走钱包接口) | 尚无游戏副本 |
 | 2026-09-29 | adslot 组件落地(logic+ui+11 测试;冷却/防连点状态按 placement 进存档,跨会话生效) | 尚无游戏副本 |
+| 2026-09-29 | shop/achievement/share/leaderboard 落地,八件套齐(累计 73 测试);统一纪律:钱包/库存不进组件,奖励只产出发放指令 | 尚无游戏副本 |
