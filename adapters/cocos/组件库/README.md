@@ -1,7 +1,7 @@
 # 商业化组件库(M4)— 休闲游戏「标配八件套」
 
 > 休闲小游戏的系统层高度同质:签到、商店、分享、排行榜、红点、广告位、设置、成就/任务。把它们做成可复用 Cocos 组件,新游戏拷副本、填配置、接回调即可上线系统层。  
-> 状态:settings/reddot 已实现(logic 核 10 测试全绿);其余为接口约定,随 001 的 M4 阶段落地。
+> 状态:settings/reddot/signin 已实现(logic 核 23 测试全绿);其余为接口约定,随 001 的 M4 阶段落地。
 
 ## 架构分层(2026-09-29 定稿,遵守 manuals/代码生成.md)
 
@@ -60,7 +60,8 @@ tests/                逻辑核测试:cd 本目录 && npm test(node --test,零 n
 | --- | --- |
 | `settings` | ✅ logic+ui,5 测试(含存档版本迁移协议参考实现) |
 | `reddot` | ✅ logic+ui,5 测试(树形聚合/脏链传播) |
-| `signin` / `shop` / `share` / `leaderboard` / `adslot` / `achievement` | ⬜ 接口已约定,随 001 M4 落地 |
+| `signin` | ✅ logic+ui,13 测试(自然日周期网格/补签限次+补签卡钱包/全勤奖/跨周期滚动/时钟回拨安全) |
+| `shop` / `share` / `leaderboard` / `adslot` / `achievement` | ⬜ 接口已约定,随 001 M4 落地 |
 
 ## 实现纪律
 
@@ -72,4 +73,4 @@ tests/                逻辑核测试:cd 本目录 && npm test(node --test,零 n
 
 | 日期 | 变更   | 同步到 |
 | -- | ---- | --- |
-| —  | 尚无实现 | —   |
+| 2026-09-29 | signin 组件落地(logic+ui+13 测试;周期按自然日网格对齐,补签走钱包接口) | 尚无游戏副本 |
