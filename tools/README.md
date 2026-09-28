@@ -7,12 +7,11 @@
 
 | 工具 | 状态 | 用途 | 用法 |
 |---|---|---|---|
-| `scorer/` | ✅ 已实现(尺寸规格+调色板;帧间一致性待建) | 资产质检评分器 | 见下 |
+| `scorer/` | ✅ 已实现(尺寸规格+调色板+帧间一致性) | 资产质检评分器 | 见下 |
 | `placeholder/` | ✅ 已实现 | 占位资产生成器(占位也挂正式 ID) | 见下 |
 | `scaffold/` | ✅ 已实现 | 新游戏脚手架(一条命令接入管线) | 见下 |
-| `scorer/`(帧间一致性) | ⬜ 待建 | 动画帧序列一致性 | 接口见 manuals/资产生产.md |
-| `关卡校验/` | ⬜ 待建 | 关卡 DSL 结构/可解性/难度曲线 | 接口见 manuals/关卡量产.md |
-| `包体统计/` | ⬜ 待建 | 构建产物体积统计 | 微信交付检查链第 3 步用 |
+| `pkgstats/` | ✅ 已实现 | 构建产物包体统计与大文件审计 | 见下 |
+| `关卡校验/` | ⬜ 待建 | 关卡 DSL 结构/可解性/难度曲线 | 等品类 DSL 定稿 |
 
 ## 环境要求
 
@@ -30,10 +29,14 @@ python E:/AiProject/vibe-pipeline/tools/scaffold/new_game.py \
 # 2. 按清单批量生成占位资产(白盒阶段)
 python E:/AiProject/vibe-pipeline/tools/placeholder/gen.py --manifest docs/资产清单.md
 
-# 3. 资产质检(尺寸规格 + 调色板一致性;--ref 给风格锚点图)
+# 3. 资产质检(尺寸规格+调色板+帧间一致性;--ref 给风格锚点图)
 python E:/AiProject/vibe-pipeline/tools/scorer/run.py \
     --manifest docs/资产清单.md --assets-root assets/art \
     --ref assets/art/spr/g001-spr-anchor-000.png
+
+# 4. 构建产物包体审计(微信交付检查链)
+python E:/AiProject/vibe-pipeline/tools/pkgstats/run.py \
+    --build-dir build/wechatgame --budget-mb 4
 ```
 
 评分器退出码:有 fail/missing → 1,否则 0(可挂 CI 卡关)。报告写 `evidence/资产质检/report.json`。

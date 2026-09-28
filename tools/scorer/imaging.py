@@ -36,3 +36,18 @@ def dominant_colors(img_rgb: Image.Image, n: int = 6, min_share: float = 0.05) -
         rgb = tuple(palette[index * 3: index * 3 + 3])
         out.append({"rgb": (rgb[0], rgb[1], rgb[2]), "share": round(share, 3)})
     return out
+
+
+def dhash(image: Image.Image, size: int = 8) -> int:
+    """差异感知哈希(64 位):缩灰到 (size+1) x size,按行比较水平相邻像素。"""
+    gray = image.convert("L").resize((size + 1, size))
+    bits = 0
+    for y in range(size):
+        row = [gray.getpixel((x, y)) for x in range(size + 1)]
+        for x in range(size):
+            bits = (bits << 1) | (1 if row[x] > row[x + 1] else 0)
+    return bits
+
+
+def hamming_distance(hash_a: int, hash_b: int) -> int:
+    return bin(hash_a ^ hash_b).count("1")

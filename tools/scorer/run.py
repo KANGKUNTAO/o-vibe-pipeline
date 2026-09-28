@@ -7,8 +7,7 @@
         [--max-mean-deltae 16] [--out evidence/资产质检/report.json]
 
 输出:JSON 报告 + 终端摘要;有 fail 时退出码 1(可挂 CI)。
-已实现检查:尺寸规格(命名/格式/尺寸/透明底)、调色板一致性。
-待建:帧间一致性(动画帧序列)。
+已实现检查:尺寸规格(命名/格式/尺寸/透明底)、调色板一致性、帧间一致性(帧数完整/尺寸一致/dHash 跳变/停滞帧)。
 """
 from __future__ import annotations
 
@@ -22,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from lib import manifest  # noqa: E402
 from scorer import imaging  # noqa: E402
-from scorer.operators import palette, size_spec  # noqa: E402
+from scorer.operators import frame_consistency, palette, size_spec  # noqa: E402
 
 LEVELS = ("fail", "warn", "pass")
 
@@ -40,6 +39,21 @@ def find_asset_file(assets_root: Path, entry: dict) -> Path | None:
         if candidate.is_file():
             return candidate
     return None
+
+
+def collect_frame_files(assets_root: Path, entry: dict, frame_count: int):
+    """按清单帧数收集帧文件;返回(找到的有序路径列表, 缺失帧文件名列表)。"""
+    cat_dir = assets_root / entry.get("类别", "")
+    paths, missing = [], []
+    for i in range(1, frame_count + 1):
+        name = f"{entry.get('ID', '')}-f{i:02d}.png"
+        for candidate in (cat_dir / name, assets_root / name):
+            if candidate.is_file():
+                paths.append(candidate)
+                break
+        else:
+            missing.append(name)
+    return paths, missing
 
 
 def _default_out(manifest_path: Path) -> Path:
@@ -77,6 +91,8 @@ def main(argv=None) -> int:
     parser.add_argument("--ref", help="风格锚点图(取其主色作参考色板)")
     parser.add_argument("--palette-json", help="参考色板 JSON(与 --ref 二选一)")
     parser.add_argument("--max-mean-deltae", type=float, default=16.0, help="调色板平均色差阈值")
+    parser.add_argument("--max-frame-jump", type=float, default=24.0,
+                        help="相邻帧 dHash 距离阈值(0~64,超阈疑似缺帧/闪帧)")
     parser.add_argument("--out", help="报告输出路径(默认 <游戏根>/evidence/资产质检/report.json)")
     args = parser.parse_args(argv)
 
@@ -105,6 +121,26 @@ def main(argv=None) -> int:
         if entry.get("类别") not in manifest.IMAGE_CATEGORIES:
             row["message"] = "非图片类资产,跳过(音频/字体检查器待建)"
             summary["skip"] += 1
+        elif (spec_of.get(asset_id, {}).get("frames") or 1) > 1:
+            spec = spec_of.get(asset_id, {})
+            frame_paths, missing_frames = collect_frame_files(
+                assets_root, entry, spec["frames"])
+            if missing_frames:
+                row["level"] = "fail"
+                row["message"] = (f"帧序列缺帧:{', '.join(missing_frames)}"
+                                  f"(清单要求 {spec['frames']} 帧)")
+            else:
+                images = [imaging.load_full(str(p)) for p in frame_paths]
+                checks = size_spec.check_entry(entry, str(frame_paths[0]), images[0], spec)
+                checks += frame_consistency.check_frames(images, args.max_frame_jump)
+                if ref_palette is not None:
+                    small = imaging.load_rgb_small(str(frame_paths[0]))
+                    checks.append(palette.check(imaging.dominant_colors(small),
+                                                ref_palette, args.max_mean_deltae))
+                row["checks"] = checks
+                row["level"] = _worst_level(checks)
+                row["file"] = str(frame_paths[0])
+                row["frames"] = len(frame_paths)
         else:
             file_path = find_asset_file(assets_root, entry)
             if file_path is None:
