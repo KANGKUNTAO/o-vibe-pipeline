@@ -1,7 +1,7 @@
 # 商业化组件库(M4)— 休闲游戏「标配八件套」
 
 > 休闲小游戏的系统层高度同质:签到、商店、分享、排行榜、红点、广告位、设置、成就/任务。把它们做成可复用 Cocos 组件,新游戏拷副本、填配置、接回调即可上线系统层。  
-> 状态:settings/reddot/signin/adslot 已实现(logic 核 34 测试全绿);其余为接口约定,随 001 的 M4 阶段落地。
+> 状态:settings/reddot/signin/adslot/shop 已实现(logic 核 44 测试全绿);其余为接口约定,随 001 的 M4 阶段落地。
 
 ## 架构分层(2026-09-29 定稿,遵守 manuals/代码生成.md)
 
@@ -62,7 +62,8 @@ tests/                逻辑核测试:cd 本目录 && npm test(node --test,零 n
 | `reddot` | ✅ logic+ui,5 测试(树形聚合/脏链传播) |
 | `signin` | ✅ logic+ui,13 测试(自然日周期网格/补签限次+补签卡钱包/全勤奖/跨周期滚动/时钟回拨安全) |
 | `adslot` | ✅ logic+ui,11 测试(防连点/连续失败冷却且跨会话持久/降级发奖开关/插屏+Banner 事件流) |
-| `shop` / `share` / `leaderboard` / `achievement` | ⬜ 接口已约定,随 001 M4 落地 |
+| `shop` | ✅ logic+ui,10 测试(商品表/每日+终身限购/钱包扣款/发放指令不入包/损坏档兜底) |
+| `share` / `leaderboard` / `achievement` | ⬜ 接口已约定,随 001 M4 落地 |
 
 ## 实现纪律
 
