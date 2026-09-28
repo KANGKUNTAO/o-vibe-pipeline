@@ -21,3 +21,6 @@ secrets/
 temp/
 tmp/
 *.log
+
+# 外部工具工作目录(不进库)
+.workbuddy/
