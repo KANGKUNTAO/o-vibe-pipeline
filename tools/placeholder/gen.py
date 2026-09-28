@@ -67,7 +67,9 @@ def _draw_placeholder(path: Path, asset_id: str, size: tuple[int, int],
 def main(argv=None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    parser = argparse.ArgumentParser(description="占位资产生成器(占位也挂正式 ID)")
+    parser = argparse.ArgumentParser(
+        description="占位资产生成器(占位也挂正式 ID)。请在游戏工程根目录执行:"
+        "相对路径(--manifest/--out-root)以当前目录为基准")
     parser.add_argument("--manifest", required=True, help="资产清单路径(docs/资产清单.md)")
     parser.add_argument("--out-root", help="输出根目录(默认 <游戏根>/assets/art)")
     parser.add_argument("--legend", help="语义色板 JSON:{\"关键词\": \"#RRGGBB\"}")
@@ -76,10 +78,18 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     manifest_path = Path(args.manifest)
+    if not manifest_path.is_file():
+        print(f"[placeholder] 清单文件不存在:{manifest_path}")
+        return 1
+    if args.legend and not Path(args.legend).is_file():
+        print(f"[placeholder] 语义色板文件不存在:{args.legend}")
+        return 1
     out_root = Path(args.out_root) if args.out_root else _default_out_root(manifest_path)
-    legend = {}
-    if args.legend:
-        legend = json.loads(Path(args.legend).read_text(encoding="utf-8"))
+    try:
+        legend = json.loads(Path(args.legend).read_text(encoding="utf-8")) if args.legend else {}
+    except json.JSONDecodeError as exc:
+        print(f"[placeholder] 语义色板 JSON 解析失败:{args.legend}({exc})")
+        return 1
     default_size = manifest.parse_spec(args.default_size)["size"]
 
     entries = [e for e in manifest.parse_manifest(manifest_path.read_text(encoding="utf-8"))

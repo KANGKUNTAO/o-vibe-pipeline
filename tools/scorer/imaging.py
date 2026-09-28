@@ -2,22 +2,39 @@
 
 评分器算子(pure functions)只消费本层产出的对象;
 路径解析在运行层(scorer/run.py),本层不出现任何业务路径。
+读取失败统一抛 AssetLoadError(带路径与原因),由运行层按条目降级为 fail。
 """
 from __future__ import annotations
 
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
+
+
+class AssetLoadError(RuntimeError):
+    """资产文件损坏或无法读取。"""
+
+    def __init__(self, path: str, reason: str):
+        super().__init__(f"{path}: {reason}")
+        self.path = path
+        self.reason = reason
+
+
+def _open(path: str) -> Image.Image:
+    try:
+        img = Image.open(path)
+        img.load()
+        return img
+    except (UnidentifiedImageError, OSError) as exc:
+        raise AssetLoadError(str(path), f"文件损坏或无法读取({exc.__class__.__name__})") from exc
 
 
 def load_full(path: str) -> Image.Image:
     """加载原图(保留 mode,用于尺寸/alpha 检查)。"""
-    img = Image.open(path)
-    img.load()
-    return img
+    return _open(path)
 
 
 def load_rgb_small(path: str, max_side: int = 64) -> Image.Image:
     """加载缩小的 RGB 图(用于调色板统计,毫秒级)。"""
-    img = Image.open(path).convert("RGB")
+    img = _open(path).convert("RGB")
     img.thumbnail((max_side, max_side))
     return img
 

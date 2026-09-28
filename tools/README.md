@@ -18,7 +18,7 @@
 - Python 3.10+,`pip install -r tools/requirements.txt`(仅 pillow + pytest)
 - 全部本地运行,无 GPU、无网络、毫秒级
 
-## 快速上手(在游戏工程根目录执行)
+## 快速上手(以下命令均在**游戏工程根目录**执行;相对路径以当前目录为基准)
 
 ```bash
 # 1. 新游戏接入管线(--into 已有 Cocos 工程 / --new 全新仓库)
@@ -27,12 +27,14 @@ python E:/AiProject/vibe-pipeline/tools/scaffold/new_game.py \
     --creator-path D:/CocosEditor/Creator/3.8.8/CocosCreator.exe
 
 # 2. 按清单批量生成占位资产(白盒阶段)
-python E:/AiProject/vibe-pipeline/tools/placeholder/gen.py --manifest docs/资产清单.md
+python E:/AiProject/vibe-pipeline/tools/placeholder/gen.py \
+    --manifest docs/资产清单.md --out-root assets/art
 
 # 3. 资产质检(尺寸规格+调色板+帧间一致性;--ref 给风格锚点图)
+#    脚手架生成的清单自带示例行 g001-spr-example-000,可直接按序跑通
 python E:/AiProject/vibe-pipeline/tools/scorer/run.py \
     --manifest docs/资产清单.md --assets-root assets/art \
-    --ref assets/art/spr/g001-spr-anchor-000.png
+    --ref assets/art/spr/g001-spr-example-000.png
 
 # 4. 构建产物包体审计(微信交付检查链)
 python E:/AiProject/vibe-pipeline/tools/pkgstats/run.py \

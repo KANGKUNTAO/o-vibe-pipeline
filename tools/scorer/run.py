@@ -82,10 +82,15 @@ def _worst_level(results: list[dict]) -> str:
     return "pass" if results else "skip"
 
 
+def _load_fail(exc: imaging.AssetLoadError) -> dict:
+    return {"check": "load", "level": "fail",
+            "message": f"文件损坏/无法读取:{exc.path}({exc.reason})", "detail": {}}
+
+
 def main(argv=None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
-    parser = argparse.ArgumentParser(description="资产质检评分器(尺寸规格+调色板)")
+    parser = argparse.ArgumentParser(description="资产质检评分器(尺寸规格+调色板+帧间一致性)")
     parser.add_argument("--manifest", required=True, help="资产清单路径(docs/资产清单.md)")
     parser.add_argument("--assets-root", required=True, help="资产文件根目录(如 assets/art)")
     parser.add_argument("--ref", help="风格锚点图(取其主色作参考色板)")
@@ -98,6 +103,13 @@ def main(argv=None) -> int:
 
     manifest_path = Path(args.manifest)
     assets_root = Path(args.assets_root)
+    if not manifest_path.is_file():
+        print(f"[scorer] 清单文件不存在:{manifest_path}")
+        return 1
+    for flag, p in (("--ref", args.ref), ("--palette-json", args.palette_json)):
+        if p and not Path(p).is_file():
+            print(f"[scorer] 文件不存在:{flag} {p}")
+            return 1
     entries = manifest.parse_manifest(manifest_path.read_text(encoding="utf-8"))
     if not entries:
         print(f"[scorer] 清单中没有解析到条目:{manifest_path}")
@@ -130,13 +142,16 @@ def main(argv=None) -> int:
                 row["message"] = (f"帧序列缺帧:{', '.join(missing_frames)}"
                                   f"(清单要求 {spec['frames']} 帧)")
             else:
-                images = [imaging.load_full(str(p)) for p in frame_paths]
-                checks = size_spec.check_entry(entry, str(frame_paths[0]), images[0], spec)
-                checks += frame_consistency.check_frames(images, args.max_frame_jump)
-                if ref_palette is not None:
-                    small = imaging.load_rgb_small(str(frame_paths[0]))
-                    checks.append(palette.check(imaging.dominant_colors(small),
-                                                ref_palette, args.max_mean_deltae))
+                try:
+                    images = [imaging.load_full(str(p)) for p in frame_paths]
+                    checks = size_spec.check_entry(entry, str(frame_paths[0]), images[0], spec)
+                    checks += frame_consistency.check_frames(images, args.max_frame_jump)
+                    if ref_palette is not None:
+                        small = imaging.load_rgb_small(str(frame_paths[0]))
+                        checks.append(palette.check(imaging.dominant_colors(small),
+                                                    ref_palette, args.max_mean_deltae))
+                except imaging.AssetLoadError as exc:
+                    checks = [_load_fail(exc)]
                 row["checks"] = checks
                 row["level"] = _worst_level(checks)
                 row["file"] = str(frame_paths[0])
@@ -151,12 +166,15 @@ def main(argv=None) -> int:
                 else:
                     row["level"], row["message"] = "skip", f"状态={status},尚无文件,跳过"
             else:
-                image = imaging.load_full(str(file_path))
-                checks = size_spec.check_entry(entry, str(file_path), image, spec_of.get(asset_id, {}))
-                if ref_palette is not None:
-                    small = imaging.load_rgb_small(str(file_path))
-                    checks.append(palette.check(imaging.dominant_colors(small),
-                                                ref_palette, args.max_mean_deltae))
+                try:
+                    image = imaging.load_full(str(file_path))
+                    checks = size_spec.check_entry(entry, str(file_path), image, spec_of.get(asset_id, {}))
+                    if ref_palette is not None:
+                        small = imaging.load_rgb_small(str(file_path))
+                        checks.append(palette.check(imaging.dominant_colors(small),
+                                                    ref_palette, args.max_mean_deltae))
+                except imaging.AssetLoadError as exc:
+                    checks = [_load_fail(exc)]
                 row["checks"] = checks
                 row["level"] = _worst_level(checks)
                 row["file"] = str(file_path)
