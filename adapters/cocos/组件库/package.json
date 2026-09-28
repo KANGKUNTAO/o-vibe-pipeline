@@ -4,6 +4,6 @@
   "type": "module",
   "description": "休闲游戏标配八件套组件库(正本)。logic 核为可擦除 TS,Node 原生类型剥离直接测试;ui.ts 在 Cocos Creator 工程内编译。",
   "scripts": {
-    "test": "node --test tests/settings.test.ts tests/reddot.test.ts tests/signin.test.ts tests/adslot.test.ts tests/shop.test.ts tests/achievement.test.ts"
+    "test": "node --test tests/settings.test.ts tests/reddot.test.ts tests/signin.test.ts tests/adslot.test.ts tests/shop.test.ts tests/achievement.test.ts tests/share.test.ts"
   }
 }
