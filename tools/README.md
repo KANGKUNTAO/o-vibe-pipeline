@@ -11,7 +11,7 @@
 | `placeholder/` | ✅ 已实现 | 占位资产生成器(占位也挂正式 ID) | 见下 |
 | `scaffold/` | ✅ 已实现 | 新游戏脚手架(一条命令接入管线) | 见下 |
 | `pkgstats/` | ✅ 已实现 | 构建产物包体统计与大文件审计 | 见下 |
-| `关卡校验/` | ⬜ 待建 | 关卡 DSL 结构/可解性/难度曲线 | 等品类 DSL 定稿 |
+| `levelcheck/` | ✅ 已实现(三消:结构/资产引用/非死局/有界求解器/难度曲线) | 关卡校验("校验不过不入库") | 见下 |
 
 ## 环境要求
 
@@ -41,7 +41,9 @@ python E:/AiProject/vibe-pipeline/tools/pkgstats/run.py \
     --build-dir build/wechatgame --budget-mb 4
 ```
 
-评分器退出码:有 fail/missing → 1,否则 0(可挂 CI 卡关)。报告写 `evidence/资产质检/report.json`。
+评分器/关卡校验退出码:有 fail → 1,否则 0(可挂 CI 卡关)。报告分别写 `evidence/资产质检/report.json`、`evidence/关卡校验/report.json`。
+
+关卡校验的诚实语义:求解器节点预算耗尽 → **warn(unverified,人工复核)**,绝不把"没算完"当"不可解";随机关(`start="random"`)的可解性由生成器保证并溯源,校验器 v1 不做求解。数值表交叉(经济)检查待经济表存在后接入(v2)。
 
 ## 资产清单的机器可读约定
 

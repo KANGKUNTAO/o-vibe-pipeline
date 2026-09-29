@@ -1,0 +1,55 @@
+{
+  "id": "g001-level-002",
+  "chapter": 1,
+  "index": 2,
+  "board": {
+    "cols": 7,
+    "rows": 7
+  },
+  "start": "random",
+  "rules": {
+    "moves": 22,
+    "objective": {
+      "type": "collect",
+      "targets": [
+        {
+          "id": "gem-blue",
+          "count": 10
+        }
+      ]
+    }
+  },
+  "gemTypes": [
+    "gem-red",
+    "gem-blue",
+    "gem-green",
+    "gem-yellow",
+    "gem-purple"
+  ],
+  "blockers": [
+    {
+      "type": "ice",
+      "cell": [
+        3,
+        3
+      ],
+      "hp": 1
+    }
+  ],
+  "mechanics": [],
+  "difficulty": {
+    "intended": 1.1,
+    "params": {
+      "deadlockRate": 0.05
+    }
+  },
+  "meta": {
+    "starThresholds": [
+      1200,
+      2400,
+      3600
+    ],
+    "genSource": "example-random-v1",
+    "genDate": "2026-09-29"
+  }
+}
